@@ -1,0 +1,77 @@
+import java.util.*;
+public class MovieLibraryTest {
+
+    private static int passed = 0;
+    private static int failed = 0;
+
+    private static void check(String name, boolean condition) {
+        if (condition) {
+            passed++;
+            System.out.println("[PASS] " + name);
+        } else {
+            failed++;
+            System.out.println("[FAIL] " + name);
+        }
+    }
+
+    public static void main(String[] args) {
+        boolean ea = false;
+        assert ea = true;
+        if (!ea) {
+            System.out.println("** คำเตือน: Assertion ปิดอยู่! แนะนำให้รันด้วย java -ea MovieLibraryTest **\n");
+        }
+
+        System.out.println("=== Starting MovieLibrary Tests ===\n");
+
+        testValidate();
+        testAdd();
+        testRemove();
+
+        System.out.println("\n=== Test Summary ===");
+        System.out.println("Passed: " + passed);
+        System.out.println("Failed: " + failed);
+        System.out.println("Total : " + (passed + failed));
+        System.out.println(failed == 0 ? ">>> ALL TESTS PASSED <<<" : ">>> SOME TESTS FAILED <<<");
+
+        if (failed > 0) {
+            System.exit(1);
+        }
+    }
+
+    private static void testValidate() {
+        System.out.println("-- 1. Validate Title Tests --");
+
+        check("valid title lowercase", MovieLibrary.validate("harry potter"));
+        check("valid title exactly 20 chars", MovieLibrary.validate("abcdefghijklmnopqrst")); 
+        check("invalid: uppercase letter", !MovieLibrary.validate("Harry Potter"));
+        check("invalid: numbers", !MovieLibrary.validate("minions 2"));
+        check("invalid: special chars", !MovieLibrary.validate("spider-man"));
+        check("invalid: > 20 chars", !MovieLibrary.validate("abcdefghijklmnopqrstu")); 
+        check("invalid: empty string", !MovieLibrary.validate(""));
+        check("invalid: null", !MovieLibrary.validate(null));
+    }
+
+     private static void testAdd() {
+        System.out.println("\n-- 2. Add Tests --");
+
+        MovieLibrary lib = new MovieLibrary();
+        check("add valid title -> true", lib.add("minions"));
+        check("add valid title -> size 1", lib.size() == 1);
+        check("add duplicate title -> false", !lib.add("minions"));
+    }
+
+     private static void testRemove() {
+        System.out.println("\n-- 2. Remove Tests --");
+
+        MovieLibrary lib = new MovieLibrary(Arrays.asList("matrix", "alien"));
+        check("remove existing -> true", lib.remove("matrix"));
+        check("size decreases after remove", lib.size() == 1);
+        check("removed movie no longer contained", !lib.contains("matrix"));
+        check("remove non-existing -> false", !lib.remove("titanic"));
+        check("remove last movie -> true", lib.remove("alien"));
+        check("size decreases after remove", lib.size() == 0);
+        check("remove form empty library -> false", !lib.remove("alien"));
+        check("remove non existing null -> false", !lib.remove(null));
+    }
+
+}
