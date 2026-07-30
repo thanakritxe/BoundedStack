@@ -1,6 +1,4 @@
 
-import java.util.*;
-
 public class BoundedStackTest {
 
     private static int passed = 0;
@@ -29,6 +27,7 @@ public class BoundedStackTest {
         testPush();
         testPop();
         testObservers();
+        testProducer();
 
         System.out.println("\n=== Test Summary ===");
         System.out.println("Passed: " + passed);
@@ -43,32 +42,27 @@ public class BoundedStackTest {
 
     private static void testCreator() {
         System.out.println("-- 1. Creator --");
-
         BoundedStack<String> stack = new BoundedStack<>(5);
         check("size = 0", stack.size() == 0);
         BoundedStack<String> minStack = new BoundedStack<>(1);
         check("create stack size 1 ", minStack.size() == 0);
-
         boolean invalidCapacity = false;
         try {
             new BoundedStack<String>(0);
         } catch (IllegalArgumentException e) {
             invalidCapacity = true;
         }
-        check("capacity <= 0 ต้องโยน IllegalArgumentException", invalidCapacity);
+        check("capacity <= 0 throw IllegalArgumentException", invalidCapacity);
     }
 
     private static void testPush() {
         System.out.println("\n-- 2. Push Tests --");
-
         BoundedStack<String> stack = new BoundedStack<>(2);
         stack.push("minions");
         check("push top size = 1", stack.size() == 1);
-        
         stack.push("minions"); 
         check("push copy size = 2", stack.size() == 2);
         check("stack is Full = true", stack.isFull());
-
         boolean nullPushed = false;
         try {
             stack.push(null);
@@ -88,11 +82,9 @@ public class BoundedStackTest {
 
     private static void testPop() {
         System.out.println("\n-- 3. Pop Tests --");
-
         BoundedStack<String> stack = new BoundedStack<>(3);
         stack.push("matrix");
         stack.push("alien");
-        
         check("pop top", stack.pop().equals("alien"));
         check("pop size = 1", stack.size() == 1);
         check("pop last", stack.pop().equals("matrix"));
@@ -107,19 +99,15 @@ public class BoundedStackTest {
     }
 
     private static void testObservers() {
-        System.out.println("\n-- 5. Observer Tests --");
-
+        System.out.println("\n-- 4. Observer Tests --");
         BoundedStack<String> stack = new BoundedStack<>(3);
         check("new stack isEmpty", stack.isEmpty());
-        
         stack.push("alien");
         stack.push("pokemon");
-        
         check("size = 2", stack.size() == 2);
         check("see the top value ", stack.top().equals("pokemon"));
         check("top --> size = 2 ", stack.size() == 2);
         check("not isFull = false", !stack.isFull());
-
         BoundedStack<String> emptyStack = new BoundedStack<>(2);
         boolean emptyTop = false;
         try {
@@ -128,5 +116,18 @@ public class BoundedStackTest {
             emptyTop = true;
         }
         check("top stack null throw Exception", emptyTop);
+    }
+
+    private static void testProducer() {
+        System.out.println("\n-- 5. Producer Tests --");
+        BoundedStack<String> original = new BoundedStack<>(5);
+        original.push("alien");
+        original.push("pokemon");
+        BoundedStack<String> copy = original.copy();
+        check("copy = original", copy.size() == original.size());
+        check("copy top = original", copy.top().equals(original.top()));
+        copy.push("matrix");
+        check("edit copy --> original not change size", original.size() == 2);
+        check("copy = 3", copy.size() == 3);
     }
 }
